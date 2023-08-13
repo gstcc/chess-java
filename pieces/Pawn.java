@@ -17,9 +17,9 @@ public class Pawn extends ChessPiece {
         // White pawns move forward by 1 row, black pawns move backward by 1 row
         // They can move forward by 2 rows on their first move
         if (getColor().equals("white")) {
-            return rowDiff == 1 || (rowDiff == 2 && currentRow == 1) && colDiff == 0;
+            return (rowDiff == 1 || (rowDiff == 2 && currentRow == 1)) && colDiff == 0;
         } else if (getColor().equals("black")) {
-            return rowDiff == -1 || (rowDiff == -2 && currentRow == 6) && colDiff == 0;
+            return (rowDiff == -1 || (rowDiff == -2 && currentRow == 6)) && colDiff == 0;
         }
 
         return false;

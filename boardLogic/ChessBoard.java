@@ -64,8 +64,19 @@ public class ChessBoard {
     }
 
     private void swapTurn(){
+        int row = (playerTurn == "white") ? 7 : 0;
+        for (ChessPiece piece : board[row]) {
+            if (piece != null && piece.getSymbol() == "P"){
+                promotion(row, piece.getCol(), piece.getColor());
+            }
+        }
         if (playerTurn == "white"){playerTurn="black";}
         else {playerTurn="white";}
+    }
+
+    private void promotion(int row, int col, String playerColor){
+        //Temporary
+        board[row][col] = new Queen(playerColor, row, col);
     }
 
     public boolean movePiece(int currentRow, int currentCol, int newRow, int newCol) {
