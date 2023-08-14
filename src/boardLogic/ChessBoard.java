@@ -18,6 +18,10 @@ public class ChessBoard {
         this.playerTurn = "white";
     }
 
+    public String getPlayerTurn() {
+        return playerTurn;
+    }
+
     public King[] getKings() {
         return kings;
     }
@@ -82,11 +86,19 @@ public class ChessBoard {
     public boolean movePiece(int currentRow, int currentCol, int newRow, int newCol) {
         if (move.isValidMove(currentRow, currentCol, newRow, newCol, playerTurn)){
             ChessPiece piece = board[currentRow][currentCol];
+
+            // Check for en passant capture and remove the pawn
+            if (piece.getSymbol().equals("P") && move.enPassantCapture(currentRow, currentCol, newRow, newCol)) {
+                int enPassantRow = currentRow + (newRow - currentRow) / 2; // Row of the captured pawn
+                board[enPassantRow][newCol] = null; // Remove the pawn en passant
+            }
+
             //Move the piece to the new position
             board[currentRow][currentCol] = null;
             board[newRow][newCol] = piece;
             piece.setRow(newRow);
             piece.setCol(newCol);
+
             if (isCheck(playerTurn)){
                 //Moved into check, don't allow and reset
                 board[currentRow][currentCol] = piece;
@@ -96,6 +108,9 @@ public class ChessBoard {
                 System.out.println("Can't move when in check");
                 return false;
             }
+
+            //Move was successful keep track of previous move for en passant and swap turn
+            move.setPrevMove(currentRow, currentCol, newRow, newCol);
             swapTurn();
             return true;
         }
@@ -126,7 +141,7 @@ public class ChessBoard {
         for (ChessPiece[] row : board) {
             for (ChessPiece piece : row) {
                 if (piece != null && !piece.getColor().equals(playerColor)) {
-                    if (piece.isValidMove(kingRow, kingCol)) {
+                    if (piece.isValidMove(kingRow, kingCol) && (!move.isPathBlocked(piece.getRow(), piece.getCol(), kingRow, kingCol))) {
                         return true; // King is in check
                     }
                 }
@@ -135,5 +150,6 @@ public class ChessBoard {
 
         return false; // King is not in check
     }
+
 }
 
