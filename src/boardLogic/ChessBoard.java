@@ -1,6 +1,11 @@
 package boardLogic;
 
+
 import pieces.*;
+import java.util.ArrayList;
+import java.util.List;
+import util.Pair;
+
 
 public class ChessBoard {
     private ChessPiece[][] board;
@@ -67,6 +72,24 @@ public class ChessBoard {
         return (kings[0].getColor() == playerColor) ? kings[0].getCol() : kings[1].getCol();
     }
 
+    public List<Pair<Integer, Integer>> getAvailableMoveCoordinates(int row, int col) {
+        ChessPiece piece = board[row][col];
+        List<Pair<Integer, Integer>> availableMoves = new ArrayList<>();
+
+        if (piece != null && piece.getColor().equals(playerTurn)) {
+            for (int newRow = 0; newRow < 8; newRow++) {
+                for (int newCol = 0; newCol < 8; newCol++) {
+                    if (move.isValidMove(row, col, newRow, newCol, playerTurn)) {
+                        availableMoves.add(new Pair<>(newRow, newCol));
+                    }
+                }
+            }
+        }
+
+        return availableMoves;
+    }
+
+
     private void swapTurn(){
         int row = (playerTurn == "white") ? 7 : 0;
         for (ChessPiece piece : board[row]) {
@@ -76,6 +99,10 @@ public class ChessBoard {
         }
         if (playerTurn == "white"){playerTurn="black";}
         else {playerTurn="white";}
+        if (isCheckmate(playerTurn)) {
+                System.out.println(playerTurn + " is in checkmate!");
+                // Handle game over or other actions
+            }
     }
 
     private void promotion(int row, int col, String playerColor){
@@ -150,6 +177,59 @@ public class ChessBoard {
 
         return false; // King is not in check
     }
+
+    public boolean isCheckmate(String playerColor) {
+        // Check if the king is in check
+        if (!isCheck(playerColor)) {
+            return false;
+        }
+    
+        // Iterate through the player's pieces
+        for (ChessPiece[] row : board) {
+            for (ChessPiece piece : row) {
+                if (piece != null && piece.getColor().equals(playerColor)) {
+                    // Get available moves for the piece
+                    List<Pair<Integer, Integer>> moves = getAvailableMoveCoordinates(piece.getRow(), piece.getCol());
+    
+                    // Try each move and see if it removes the check
+                    for (Pair<Integer, Integer> move : moves) {
+                        int newRow = move.getFirst();
+                        int newCol = move.getSecond();
+                        Pair<Integer, Integer> prevCoords = new Pair<Integer,Integer>(piece.getRow(), piece.getCol());
+    
+                        // Simulate the move and check if it removes the check
+                        ChessPiece originalPiece = board[newRow][newCol];
+                        board[newRow][newCol] = piece;
+                        board[piece.getRow()][piece.getCol()] = null;
+                        piece.setRow(newRow);
+                        piece.setCol(newCol);
+    
+                        if (!isCheck(playerColor)) {
+                            // Move removes check, so not in checkmate
+                            board[piece.getRow()][piece.getCol()] = piece;
+                            piece.setRow(prevCoords.getFirst());
+                            piece.setCol(prevCoords.getSecond());
+                            board[newRow][newCol] = originalPiece;
+                            return false;
+                        }
+    
+                        // Undo the move
+                        board[prevCoords.getFirst()][prevCoords.getSecond()] = piece;
+                        piece.setRow(prevCoords.getFirst());
+                        piece.setCol(prevCoords.getSecond());
+                        board[newRow][newCol] = originalPiece;
+                    }
+                }
+            }
+        }
+    
+        // No move removes the check, it's checkmate
+        return true;
+    }
+    
+    
+    
+    
 
 }
 

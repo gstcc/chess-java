@@ -3,9 +3,13 @@ import java.awt.image.BufferedImage;
 import javax.swing.*;
 import javax.swing.border.*;
 import pieces.*;
+import util.Pair;
 import boardLogic.ChessBoard;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
+
+
 
 public class ChessGUI {
 
@@ -35,11 +39,11 @@ public class ChessGUI {
         JToolBar tools = new JToolBar();
         tools.setFloatable(false);
         gui.add(tools, BorderLayout.PAGE_START);
-        tools.add(new JButton("New")); // TODO - add functionality!
-        tools.add(new JButton("Save")); // TODO - add functionality!
-        tools.add(new JButton("Restore")); // TODO - add functionality!
+        tools.add(new JButton("New")); 
+        tools.add(new JButton("Save")); 
+        tools.add(new JButton("Restore")); 
         tools.addSeparator();
-        tools.add(new JButton("Resign")); // TODO - add functionality!
+        tools.add(new JButton("Resign")); 
         tools.addSeparator();
         tools.add(message);
 
@@ -95,18 +99,45 @@ public class ChessGUI {
     }
 
     private void handleSquareClick(int row, int col) {
+        
         if (selectedRow == -1 && selectedCol == -1) {
             ChessPiece selectedPiece = gameBoard.getBoard()[row][col];
+            JButton selectedButton = chessBoardSquares[row][col];
+
             if (selectedPiece != null && selectedPiece.getColor().equals(gameBoard.getPlayerTurn())) {
+                selectedButton.setBorder(new LineBorder(Color.GREEN, 3)); // Highlight with green border
                 selectedRow = row;
                 selectedCol = col;
+
+                // Get available move coordinates
+                List<Pair<Integer, Integer>> availableMoveCoords = gameBoard.getAvailableMoveCoordinates(row, col);
+                
+                // Highlight available move coordinates
+                highlightAvailableMoves(availableMoveCoords);
             }
         } else {
             if (gameBoard.movePiece(selectedRow, selectedCol, row, col)) {
                 updateChessBoardUI();
             }
+            resetHighlightedSquares();
             selectedRow = -1;
             selectedCol = -1;
+        }
+    }
+
+    private void highlightAvailableMoves(List<Pair<Integer, Integer>> availableMoves) {
+        for (Pair<Integer, Integer> move : availableMoves) {
+            int row = move.getFirst();
+            int col = move.getSecond();
+            chessBoardSquares[row][col].setBorder(new LineBorder(Color.BLUE, 3)); // Highlight with blue border
+        }
+    }
+
+    private void resetHighlightedSquares() {
+        for (JButton[] row : chessBoardSquares) {
+            for (JButton button : row) {
+                button.setBorder(null); // Reset border color
+            }
         }
     }
 

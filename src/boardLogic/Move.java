@@ -1,5 +1,7 @@
 package boardLogic;
+
 import pieces.ChessPiece;
+import pieces.Pawn;
 
 public class Move {
     private ChessBoard chessBoard;
@@ -8,7 +10,8 @@ public class Move {
     public Move(ChessBoard board){
         this.chessBoard = board;
         this.prevMove = new int[4];
-    }
+    };
+    
 
     public void setPrevMove(int prevRow, int prevCol, int newRow, int newCol){
         prevMove[0] = prevRow;
@@ -22,35 +25,39 @@ public class Move {
         ChessPiece piece = board[currentRow][currentCol];
 
         if (piece == null) {
-            System.out.println("There is no piece at the specified source position.");
+            //System.out.println("There is no piece at the specified source position.");
             return false;
         }
 
         if (piece.getColor() != playerColor){
-            System.out.println("Can't move an opponents piece");
+            //System.out.println("Can't move an opponents piece");
             return false;
         }
 
         ChessPiece destinationPiece = board[newRow][newCol];
 
-        if (Math.abs(newRow - currentRow) == 1 && Math.abs(newCol - currentCol) == 1 && piece.getSymbol().equals("P")) {
-            if (destinationPiece != null && !destinationPiece.getColor().equals(piece.getColor())) {
-                return true; // Valid diagonal capture
+        //Pawn capture
+        if (piece.getSymbol().equals("P") && Math.abs(currentCol-newCol)==1){
+            // Check for en passant
+            if ((currentRow==prevMove[2]) && enPassantCapture(currentRow, currentCol, newRow, newCol)) {
+                return true;
             }
+            int direction = (piece.getColor().equals("white")) ? 1 : -1;
+            return currentRow+direction==newRow && destinationPiece != null;
         }
 
-        // Check for en passant
-        if (piece.getSymbol().equals("P") && enPassantCapture(currentRow, currentCol, newRow, newCol)) {
-            return true;
+        //Pawn can't move straight into another piece
+        if (destinationPiece != null && piece.getSymbol().equals("P")){
+            return false;
         }
 
         if (!piece.isValidMove(newRow, newCol)) {
-            System.out.println("Invalid move for the selected piece.");
+            //System.out.println("Invalid move for the selected piece.");
             return false;
         }
 
         if (destinationPiece != null && destinationPiece.getColor().equals(piece.getColor())) {
-            System.out.println("Cannot capture your own piece.");
+            //System.out.println("Cannot capture your own piece.");
             return false;
         }
         
@@ -73,7 +80,7 @@ public class Move {
 
         while (row != newRow || col != newCol) {
             if (board[row][col] != null) {
-                System.out.println("Cannot move over your own piece");
+                //System.out.println("Cannot move over your own piece");
                 return true; // Path is blocked
             }
             row += rowStep;
@@ -84,19 +91,25 @@ public class Move {
     }
 
     public boolean enPassantCapture(int currentRow, int currentCol, int newRow, int newCol) {
-        if (Math.abs(currentCol - newCol) == 1 && Math.abs(newRow - prevMove[2])==1 && newCol == prevMove[3]) {
-            ChessPiece[][] board = chessBoard.getBoard();
-            ChessPiece prevPiece = board[prevMove[2]][prevMove[3]];
-    
-            // Check if the previous piece was a pawn, moved two squares, and is of the opposite color
-            if (prevPiece != null && prevPiece.getColor().equals(getOpponentColor(chessBoard.getPlayerTurn()))
-                    && prevPiece.getSymbol().equals("P") && Math.abs(prevMove[2] - prevMove[0]) == 2) {
+        ChessPiece[][] board = chessBoard.getBoard();
+        ChessPiece prevPiece = board[prevMove[2]][prevMove[3]];
+        // Check if the previous piece was a pawn, moved two squares, and is of the opposite color
+        if (prevPiece.getSymbol().equals("P") &&
+            prevPiece.getColor().equals(getOpponentColor(chessBoard.getPlayerTurn())) &&
+            Math.abs(prevMove[2] - prevMove[0]) == 2) {
+            System.out.println("got here");
+            // Ensure white only captures downwards and black only captures upwards
+            int direction = chessBoard.getPlayerTurn().equals("white") ? 1 : -1;
+            int expectedRow = prevMove[2] + direction;
+
+            if (newRow == expectedRow && Math.abs(currentCol - newCol) == 1 && newCol == prevMove[3]) {
                 return true;
             }
         }
 
         return false;
     }
+
     
     // Helper function to get the opponent's color
     private String getOpponentColor(String playerColor) {
