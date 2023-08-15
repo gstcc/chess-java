@@ -15,4 +15,8 @@ public class Pair<A, B> {
     public B getSecond() {
         return second;
     }
+
+    public String toString(){
+        return (first.toString() + " " + second.toString());
+    }
 }

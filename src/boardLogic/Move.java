@@ -97,7 +97,6 @@ public class Move {
         if (prevPiece.getSymbol().equals("P") &&
             prevPiece.getColor().equals(getOpponentColor(chessBoard.getPlayerTurn())) &&
             Math.abs(prevMove[2] - prevMove[0]) == 2) {
-            System.out.println("got here");
             // Ensure white only captures downwards and black only captures upwards
             int direction = chessBoard.getPlayerTurn().equals("white") ? 1 : -1;
             int expectedRow = prevMove[2] + direction;

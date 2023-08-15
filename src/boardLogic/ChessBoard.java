@@ -75,7 +75,6 @@ public class ChessBoard {
     public List<Pair<Integer, Integer>> getAvailableMoveCoordinates(int row, int col) {
         ChessPiece piece = board[row][col];
         List<Pair<Integer, Integer>> availableMoves = new ArrayList<>();
-
         if (piece != null && piece.getColor().equals(playerTurn)) {
             for (int newRow = 0; newRow < 8; newRow++) {
                 for (int newCol = 0; newCol < 8; newCol++) {
@@ -145,8 +144,6 @@ public class ChessBoard {
     }
 
     public void printBoard() {
-
-        
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 ChessPiece piece = board[row][col];
@@ -200,15 +197,16 @@ public class ChessBoard {
                         // Simulate the move and check if it removes the check
                         ChessPiece originalPiece = board[newRow][newCol];
                         board[newRow][newCol] = piece;
+                        //move black queen to (6, 5)
                         board[piece.getRow()][piece.getCol()] = null;
                         piece.setRow(newRow);
                         piece.setCol(newCol);
     
                         if (!isCheck(playerColor)) {
                             // Move removes check, so not in checkmate
-                            board[piece.getRow()][piece.getCol()] = piece;
                             piece.setRow(prevCoords.getFirst());
                             piece.setCol(prevCoords.getSecond());
+                            board[piece.getRow()][piece.getCol()] = piece;
                             board[newRow][newCol] = originalPiece;
                             return false;
                         }
@@ -224,6 +222,7 @@ public class ChessBoard {
         }
     
         // No move removes the check, it's checkmate
+        System.out.println("checkmate");
         return true;
     }
     
