@@ -13,6 +13,7 @@ public class ChessBoard {
     private Move move;
     private String playerTurn;
     private boolean isGameOver;
+    private boolean promotion;
  
     public ChessBoard() {
         this.board = new ChessPiece[8][8];
@@ -78,6 +79,10 @@ public class ChessBoard {
         return isGameOver;
     }
 
+    public boolean getPromotion(){
+        return promotion;
+    }
+
     public List<Pair<Integer, Integer>> getAvailableMoveCoordinates(int row, int col) {
         ChessPiece piece = board[row][col];
         List<Pair<Integer, Integer>> availableMoves = new ArrayList<>();
@@ -128,12 +133,6 @@ public class ChessBoard {
 
 
     private void swapTurn(){
-        int row = (playerTurn == "white") ? 7 : 0;
-        for (ChessPiece piece : board[row]) {
-            if (piece != null && piece.getSymbol() == "P"){
-                promotion(row, piece.getCol(), piece.getColor());
-            }
-        }
         if (playerTurn == "white"){playerTurn="black";}
         else {playerTurn="white";}
         if (isCheckmate(playerTurn)) {
@@ -143,9 +142,23 @@ public class ChessBoard {
             }
     }
 
-    private void promotion(int row, int col, String playerColor){
-        //Temporary
-        board[row][col] = new Queen(playerColor, row, col);
+    public void promotion(int row, int col, String piece){
+        ChessPiece promotedPiece;
+        //Piece has already been moved and turn swapped, so we need to create a piece
+        //that has the opposite color
+        String turn = (playerTurn == "white") ? "black" : "white";
+
+        if (piece.equals("queen")) {
+            promotedPiece = new Queen(turn, row, col);
+        } else if (piece.equals("rook")) {
+            promotedPiece = new Rook(turn, row, col);
+        } else if (piece.equals("bishop")) {
+            promotedPiece = new Bishop(turn, row, col);
+        } else {
+            promotedPiece = new Knight(turn, row, col);
+        } 
+        promotion = false;
+        board[row][col] = promotedPiece;
     }
 
     public boolean movePiece(int currentRow, int currentCol, int newRow, int newCol) {
@@ -176,6 +189,12 @@ public class ChessBoard {
 
             //Move was successful keep track of previous move for en passant and swap turn
             move.setPrevMove(currentRow, currentCol, newRow, newCol);
+            int row = (playerTurn == "white") ? 7 : 0;
+            for (ChessPiece possiblePawn : board[row]) {
+                if (possiblePawn != null && possiblePawn.getSymbol() == "P"){
+                    promotion = true;
+                }
+            }
             swapTurn();
             return true;
         }

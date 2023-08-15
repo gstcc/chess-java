@@ -122,6 +122,31 @@ public class ChessGUI {
             }
         } else {
             if (gameBoard.movePiece(selectedRow, selectedCol, row, col)) {
+                if (gameBoard.getPromotion()){
+                    String[] options = { "Queen", "Rook", "Bishop", "Knight" };
+                    String promotionChoice;
+                    int choice = JOptionPane.showOptionDialog(null, "Choose a promotion piece:",
+                            "Promotion", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+                            null, options, options[0]);
+
+                    switch (choice) {
+                        case 0:
+                            promotionChoice = "queen";
+                            break;
+                        case 1:
+                            promotionChoice = "rook";
+                            break;
+                        case 2:
+                            promotionChoice = "bishop";
+                            break;
+                        case 3:
+                            promotionChoice = "knight";
+                            break;
+                        default:
+                            promotionChoice = "pawn";
+                    }
+                    gameBoard.promotion(row, col, promotionChoice);
+                }
                 updateChessBoardUI();
 
                 if (gameBoard.getIsGameOver()) {
