@@ -75,18 +75,35 @@ public class ChessBoard {
     public List<Pair<Integer, Integer>> getAvailableMoveCoordinates(int row, int col) {
         ChessPiece piece = board[row][col];
         List<Pair<Integer, Integer>> availableMoves = new ArrayList<>();
+        
         if (piece != null && piece.getColor().equals(playerTurn)) {
             for (int newRow = 0; newRow < 8; newRow++) {
                 for (int newCol = 0; newCol < 8; newCol++) {
                     if (move.isValidMove(row, col, newRow, newCol, playerTurn)) {
-                        availableMoves.add(new Pair<>(newRow, newCol));
+                        // Simulate the move and see if it removes the check
+                        ChessPiece originalPiece = board[newRow][newCol];
+                        board[newRow][newCol] = piece;
+                        board[row][col] = null;
+                        piece.setRow(newRow);
+                        piece.setCol(newCol);
+    
+                        if (!isCheck(playerTurn)) {
+                            availableMoves.add(new Pair<>(newRow, newCol));
+                        }
+    
+                        // Undo the move
+                        board[row][col] = piece;
+                        piece.setRow(row);
+                        piece.setCol(col);
+                        board[newRow][newCol] = originalPiece;
                     }
                 }
             }
         }
-
+    
         return availableMoves;
     }
+    
 
 
     private void swapTurn(){
@@ -197,7 +214,6 @@ public class ChessBoard {
                         // Simulate the move and check if it removes the check
                         ChessPiece originalPiece = board[newRow][newCol];
                         board[newRow][newCol] = piece;
-                        //move black queen to (6, 5)
                         board[piece.getRow()][piece.getCol()] = null;
                         piece.setRow(newRow);
                         piece.setCol(newCol);
