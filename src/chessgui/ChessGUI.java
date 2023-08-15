@@ -16,7 +16,7 @@ public class ChessGUI {
     private final JPanel gui = new JPanel(new BorderLayout(3, 3));
     private JButton[][] chessBoardSquares = new JButton[8][8];
     private JPanel chessBoard;
-    private ChessBoard gameBoard; // Added reference to your ChessBoard class
+    private ChessBoard gameBoard;
     private final JLabel message = new JLabel(
             "Chess Champ is ready to play!");
     private static final String COLS = "ABCDEFGH";
@@ -39,11 +39,16 @@ public class ChessGUI {
         JToolBar tools = new JToolBar();
         tools.setFloatable(false);
         gui.add(tools, BorderLayout.PAGE_START);
-        tools.add(new JButton("New")); 
-        tools.add(new JButton("Save")); 
-        tools.add(new JButton("Restore")); 
+        JButton restoreButton = new JButton("Restore");
+        restoreButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                gameBoard.resetGame(); // Reset the game
+                updateChessBoardUI();
+            }
+        });
+        tools.add(restoreButton); 
         tools.addSeparator();
-        tools.add(new JButton("Resign")); 
         tools.addSeparator();
         tools.add(message);
 
@@ -118,6 +123,19 @@ public class ChessGUI {
         } else {
             if (gameBoard.movePiece(selectedRow, selectedCol, row, col)) {
                 updateChessBoardUI();
+
+                if (gameBoard.getIsGameOver()) {
+                    int option = JOptionPane.showConfirmDialog(
+                            gui, "Game over! Do you want to play again?", "Game Over",
+                            JOptionPane.YES_NO_OPTION);
+                    
+                    if (option == JOptionPane.YES_OPTION) {
+                        gameBoard.resetGame();
+                        updateChessBoardUI();
+                    } else {
+                        System.exit(0); // Exit the program
+                    }
+                }
             }
             resetHighlightedSquares();
             selectedRow = -1;

@@ -1,7 +1,5 @@
 package boardLogic;
-
 import pieces.ChessPiece;
-import pieces.Pawn;
 
 public class Move {
     private ChessBoard chessBoard;
@@ -43,7 +41,7 @@ public class Move {
                 return true;
             }
             int direction = (piece.getColor().equals("white")) ? 1 : -1;
-            return currentRow+direction==newRow && destinationPiece != null;
+            return currentRow+direction==newRow && destinationPiece != null && !destinationPiece.getColor().equals(piece.getColor());
         }
 
         //Pawn can't move straight into another piece

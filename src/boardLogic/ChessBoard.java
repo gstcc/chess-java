@@ -11,8 +11,9 @@ public class ChessBoard {
     private ChessPiece[][] board;
     private King[] kings;
     private Move move;
-    String playerTurn;
-
+    private String playerTurn;
+    private boolean isGameOver;
+ 
     public ChessBoard() {
         this.board = new ChessPiece[8][8];
         this.kings = new King[2];
@@ -21,6 +22,7 @@ public class ChessBoard {
         initializeBoard();
         this.move = new Move(this);
         this.playerTurn = "white";
+        this.isGameOver = false;
     }
 
     public String getPlayerTurn() {
@@ -72,6 +74,10 @@ public class ChessBoard {
         return (kings[0].getColor() == playerColor) ? kings[0].getCol() : kings[1].getCol();
     }
 
+    public boolean getIsGameOver(){
+        return isGameOver;
+    }
+
     public List<Pair<Integer, Integer>> getAvailableMoveCoordinates(int row, int col) {
         ChessPiece piece = board[row][col];
         List<Pair<Integer, Integer>> availableMoves = new ArrayList<>();
@@ -104,6 +110,21 @@ public class ChessBoard {
         return availableMoves;
     }
     
+    public void resetGame() {
+        // Clear the board
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                board[row][col] = null;
+            }
+        }
+        
+        // Initialize the board again
+        initializeBoard();
+    
+        // Reset player turn to white
+        playerTurn = "white";
+        isGameOver = false;
+    }
 
 
     private void swapTurn(){
@@ -118,6 +139,7 @@ public class ChessBoard {
         if (isCheckmate(playerTurn)) {
                 System.out.println(playerTurn + " is in checkmate!");
                 // Handle game over or other actions
+                isGameOver = true;
             }
     }
 
