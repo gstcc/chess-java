@@ -27,6 +27,13 @@ To run the chess game on your local machine, follow these steps:
 4. The game checks for check and checkmate conditions, and the GUI will display the outcome accordingly.
 
 ## Screenshots
+![Gameplay Screenshot 1](https://github.com/gstcc/chess-java/blob/main/icons/screenshots/Sk%C3%A4rmbild%202023-08-15%20150419.png)
+![Gameplay Screenshot 2](https://github.com/gstcc/chess-java/blob/main/icons/screenshots/Sk%C3%A4rmbild%202023-08-15%20150720.png)
+*Description: Gameplay screenshot showing pieces and moves.*
+
+![Gameplay Screenshot 3](https://github.com/gstcc/chess-java/blob/main/icons/screenshots/Sk%C3%A4rmbild%202023-08-15%20150843.png)
+*Description: Game over screen.*
+
 
 
 ## Limitations
